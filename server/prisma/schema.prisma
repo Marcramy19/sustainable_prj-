@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  city         String?
+  bio          String?
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  items        Item[]
+  swapRequests SwapRequest[] @relation("SentSwaps")
+}
+
+model Item {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  category    String   // electronics, books, clothing, etc.
+  condition   String   // new, like_new, good, fair
+  status      String   @default("available") // available, swapped
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Scopes for swaps
+  offeredIn   SwapRequest[] @relation("OfferedItem")
+  requestedIn SwapRequest[] @relation("RequestedItem")
+
+  @@index([category])
+  @@index([status])
+}
+
+model SwapRequest {
+  id              String   @id @default(uuid())
+  status          String   @default("pending") // pending, accepted, rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  requesterId     String
+  requester       User     @relation("SentSwaps", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  offeredItemId   String
+  offeredItem     Item     @relation("OfferedItem", fields: [offeredItemId], references: [id], onDelete: Cascade)
+
+  requestedItemId String
+  requestedItem   Item     @relation("RequestedItem", fields: [requestedItemId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
