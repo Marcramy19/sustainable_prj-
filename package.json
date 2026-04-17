@@ -1,0 +1,7 @@
+{
+    "name": "ecoswap-deploy",
+    "version": "1.0.0",
+    "scripts": {
+        "vercel-build": "cd server && npm install && npx prisma generate && cd ../client && npm install && npm run build"
+    }
+}
