@@ -29,8 +29,4 @@ app.get('/api/health', (req, res) => {
 // Global error handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`EcoSwap server running on port ${PORT}`);
-});
 
-module.exports = app;
